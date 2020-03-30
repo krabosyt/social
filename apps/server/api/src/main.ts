@@ -1,17 +1,26 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
+require('dotenv').config();
 
 import * as express from 'express';
+import * as bodyParser from 'body-parser';
+import * as mongoose from 'mongoose';
+
+import ProfileRouter from './app/routes/profile.routes';
+
+mongoose.connect(process.env.MONGO_CONNECTION_STRING, {
+  useNewUrlParser: true
+});
+
+const db = mongoose.connection;
+db.on('error', e => console.log(e));
+db.on('open', () => console.log('connected to database'));
 
 const app = express();
 
-app.get('/api', (req, res) => {
-  res.send({ message: 'Welcome to api!' });
-});
+app.use(bodyParser.json());
 
-const port = process.env.port || 3333;
+app.use('/api', ProfileRouter);
+
+const port = process.env.API_PORT || 3333;
 const server = app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}/api`);
 });
